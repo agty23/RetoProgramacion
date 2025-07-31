@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import Cajon, Objeto, Accion
 
-# Función auxiliar para registrar acciones
+# Función que se llama cada que se realiza una acción, y guardarla en la base de datos
 def registrar_accion(tipo_accion, cajon=None, objeto=None, descripcion=""):
     """
     Registra una acción en el sistema
@@ -24,7 +24,7 @@ def registrar_accion(tipo_accion, cajon=None, objeto=None, descripcion=""):
         print(f"Error al registrar acción: {str(e)}")
         return None
 
-
+# Creación de la caja
 def crear_caja(request):
     if request.method == 'POST':
         nombre = request.POST.get('nombre')
@@ -59,7 +59,7 @@ def crear_caja(request):
     # Si es GET o hubo error, mostrar el formulario
     # Obtener todas las cajas existentes para mostrarlas
     cajas = Cajon.objects.all()
-    # Obtener las últimas 5 acciones para mostrar en el dashboard
+    # Obtener las últimas 5 acciones para mostrar en el crear cajas
     ultimas_acciones = Accion.objects.all().order_by('-fecha_hora')[:5]
     
     context = {
