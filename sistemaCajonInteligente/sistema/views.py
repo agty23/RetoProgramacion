@@ -159,7 +159,7 @@ def añadir_objeto(request):
         'tamanios_objeto': tamanios_objeto,
     }
     return render(request, 'InterfazAñadirObjetos.html', context)
-<<<<<<< HEAD
+
 
 def historial_acciones(request):
     """
@@ -179,5 +179,4 @@ def historial_acciones(request):
         'total_acciones': acciones.count(),
     }
     return render(request, 'historial_acciones.html', context)
-=======
->>>>>>> ff3eef3fff665a88bfdff28d0583c0ac92299420
+

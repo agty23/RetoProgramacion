@@ -22,19 +22,19 @@
             margin: 20px auto;
             max-width: 500px;
         }
-
+        
         .alert {
             padding: 10px;
             margin: 10px 0;
             border-radius: 5px;
         }
-
+        
         .alert-success {
             background-color: #d4edda;
             color: #155724;
             border: 1px solid #c3e6cb;
         }
-
+        
         .alert-error {
             background-color: #f8d7da;
             color: #721c24;
@@ -77,7 +77,7 @@
         button:hover {
             background-color: #0056b3;
         }
-
+        
         .objetos-list {
             max-width: 500px;
             margin: 30px auto;
@@ -86,7 +86,7 @@
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-
+        
         .objeto-item {
             border: 1px solid #ddd;
             padding: 10px;
@@ -94,12 +94,11 @@
             border-radius: 5px;
             background-color: #f9f9f9;
         }
-
+        
         .nav-links {
             text-align: center;
             margin: 20px 0;
         }
-
         .nav-links a {
             background-color: #28a745;
             color: white;
@@ -108,7 +107,6 @@
             border-radius: 4px;
             margin: 0 10px;
         }
-
         .nav-links a:hover {
             background-color: #218838;
         }
@@ -121,67 +119,78 @@
         <a href="{% url 'crear_caja' %}">Crear Cajas</a>
         <a href="{% url 'historial_acciones' %}">Ver Historial</a>
     </div>
-    {% endfor %}
-</div>
-{% endif %}
+    
+    <!-- Mostrar mensajes de éxito o error -->
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
 
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-
-    <label for="nombre">Nombre del objeto:</label>
-    <input type="text" id="nombre" name="nombre" required>
-
-    <label for="tipoObjeto">Tipo del objeto:</label>
-    <select id="tipoObjeto" name="tipoObjeto" required>
-        <option value="">Selecciona un tipo</option>
-        {% for valor, etiqueta in tipos_objeto %}
-        <option value="{{ valor }}">{{ etiqueta }}</option>
-        {% endfor %}
-    </select>
-
-    <label for="tamanio">Tamaño del objeto:</label>
-    <select id="tamanio" name="tamanio" required>
-        <option value="">Selecciona un tamaño</option>
-        {% for valor, etiqueta in tamanios_objeto %}
-        <option value="{{ valor }}">{{ etiqueta }}</option>
-        {% endfor %}
-    </select>
-
-    <label for="caja">Caja:</label>
-    <select id="caja" name="caja" required>
-        <option value="">Selecciona una caja</option>
-        {% for caja in cajas %}
-        <option value="{{ caja.id }}">{{ caja.nombre }} ({{ caja.objetos.count }}/{{ caja.capacidadMaxima }})</option>
-        {% endfor %}
-    </select>
-    <label for="foto">Foto del objeto (opcional):</label>
-    <input type="file" id="foto" name="foto" accept="image/*">
-
-    <button type="submit">Agregar Objeto</button>
-</form>
-
-<!-- Mostrar objetos existentes -->
-{% if objetos %}
-<div class="objetos-list">
-    <h2>Objetos Existentes</h2>
-    {% for objeto in objetos %}
-    <div class="objeto-item">
-        <strong>Nombre:</strong> {{ objeto.nombre }}<br>
-        <strong>Tipo:</strong> {{ objeto.get_tipo_display }}<br>
-        <strong>Tamaño:</strong> {{ objeto.get_tamanio_display }}<br>
-        <strong>En cajas:</strong>
-        {% for caja in objeto.cajones.all %}
-        {{ caja.nombre }}{% if not forloop.last %}, {% endif %}
-        {% empty %}
-        Ninguna
-        {% endfor %}
-    </div>
-    {% endfor %}
-</div>
-{% else %}
-<div class="objetos-list">
-    <p style="text-align: center; color: #666;">No hay objetos creados aún.</p>
-</div>
-{% endif %}
+    <!-- Formulario para añadir objeto -->
+    
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <label for="nombre">Nombre del objeto:</label>
+        <input type="text" id="nombre" name="nombre" required>
+        
+        <label for="tipoObjeto">Tipo del objeto:</label>
+        <select id="tipoObjeto" name="tipoObjeto" required>
+            <option value="">Selecciona un tipo</option>
+            {% for valor, etiqueta in tipos_objeto %}
+                <option value="{{ valor }}">{{ etiqueta }}</option>
+            {% endfor %}
+        </select>
+        
+        <label for="tamanio">Tamaño del objeto:</label>
+        <select id="tamanio" name="tamanio" required>
+            <option value="">Selecciona un tamaño</option>
+            {% for valor, etiqueta in tamanios_objeto %}
+                <option value="{{ valor }}">{{ etiqueta }}</option>
+            {% endfor %}
+        </select>
+        
+        <label for="caja">Caja:</label>
+        <select id="caja" name="caja" required>
+            <option value="">Selecciona una caja</option>
+            {% for caja in cajas %}
+                <option value="{{ caja.id }}">{{ caja.nombre }} ({{ caja.objetos.count }}/{{ caja.capacidadMaxima }})</option>
+            {% endfor %}
+        </select>
+        
+        <label for="foto">Foto del objeto (opcional):</label>
+        <input type="file" id="foto" name="foto" accept="image/*">
+        
+        <button type="submit">Agregar Objeto</button>
+    </form>
+    
+    <!-- Mostrar objetos existentes -->
+    {% if objetos %}
+        <div class="objetos-list">
+            <h2>Objetos Existentes</h2>
+            {% for objeto in objetos %}
+                <div class="objeto-item">
+                    <strong>Nombre:</strong> {{ objeto.nombre }}<br>
+                    <strong>Tipo:</strong> {{ objeto.get_tipo_display }}<br>
+                    <strong>Tamaño:</strong> {{ objeto.get_tamanio_display }}<br>
+                    <strong>En cajas:</strong> 
+                    {% for caja in objeto.cajones.all %}
+                        {{ caja.nombre }}{% if not forloop.last %}, {% endif %}
+                    {% empty %}
+                        Ninguna
+                    {% endfor %}
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="objetos-list">
+            <p style="text-align: center; color: #666;">No hay objetos creados aún.</p>
+        </div>
+    {% endif %}
 </body>
 </html>
