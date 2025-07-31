@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial de Acciones</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-top: 20px;
+        }
+
+        .nav-links {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .nav-links a {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 0 10px;
+        }
+        
+        .nav-links a:hover {
+            background-color: #218838;
+        }
+
+        .historial-container {
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .stats {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .accion-item {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            border-left: 4px solid #007bff;
+        }
+
+        .accion-item.crear_cajon {
+            border-left-color: #28a745;
+        }
+
+        .accion-item.agregar_objeto {
+            border-left-color: #17a2b8;
+        }
+
+        .accion-item.eliminar_objeto {
+            border-left-color: #dc3545;
+        }
+
+        .accion-item.modificar_cajon,
+        .accion-item.modificar_objeto {
+            border-left-color: #ffc107;
+        }
+
+        .accion-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .accion-tipo {
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #333;
+        }
+
+        .accion-fecha {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .accion-descripcion {
+            color: #555;
+            line-height: 1.4;
+        }
+
+        .accion-detalles {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .pagination {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .pagination a {
+            display: inline-block;
+            padding: 8px 16px;
+            margin: 0 4px;
+            text-decoration: none;
+            border: 1px solid #ddd;
+            color: #007bff;
+            border-radius: 4px;
+        }
+
+        .pagination a:hover {
+            background-color: #e9ecef;
+        }
+
+        .pagination .current {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        .no-acciones {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 40px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Historial de Acciones del Sistema</h1>
+    
+    <div class="nav-links">
+        <a href="{% url 'crear_caja' %}">Crear Cajas</a>
+        <a href="{% url 'añadir_objeto' %}">Añadir Objetos</a>
+    </div>
+
+    <div class="historial-container">
+        <div class="stats">
+            <h3>Estadísticas</h3>
+            <p><strong>Total de acciones registradas:</strong> {{ total_acciones }}</p>
+        </div>
+
+        {% if acciones %}
+            {% for accion in acciones %}
+                <div class="accion-item {{ accion.tipo }}">
+                    <div class="accion-header">
+                        <span class="accion-tipo">{{ accion.get_tipo_display }}</span>
+                        <span class="accion-fecha">{{ accion.fecha_hora|date:"d/m/Y H:i:s" }}</span>
+                    </div>
+                    
+                    {% if accion.descripcion %}
+                        <div class="accion-descripcion">
+                            {{ accion.descripcion }}
+                        </div>
+                    {% endif %}
+                    
+                    <div class="accion-detalles">
+                        {% if accion.cajon %}
+                            <strong>Cajón:</strong> {{ accion.cajon.nombre }}<br>
+                        {% endif %}
+                        
+                        {% if accion.objetosAfectados.exists %}
+                            <strong>Objetos afectados:</strong>
+                            {% for objeto in accion.objetosAfectados.all %}
+                                {{ objeto.nombre }}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+
+            <!-- Paginación -->
+            {% if acciones.has_other_pages %}
+                <div class="pagination">
+                    {% if acciones.has_previous %}
+                        <a href="?page=1">&laquo; primera</a>
+                        <a href="?page={{ acciones.previous_page_number }}">anterior</a>
+                    {% endif %}
+
+                    {% for num in acciones.paginator.page_range %}
+                        {% if acciones.number == num %}
+                            <span class="current">{{ num }}</span>
+                        {% elif num > acciones.number|add:'-3' and num < acciones.number|add:'3' %}
+                            <a href="?page={{ num }}">{{ num }}</a>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if acciones.has_next %}
+                        <a href="?page={{ acciones.next_page_number }}">siguiente</a>
+                        <a href="?page={{ acciones.paginator.num_pages }}">última &raquo;</a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="no-acciones">
+                <p>No hay acciones registradas en el sistema aún.</p>
+                <p>Comienza creando cajas y añadiendo objetos para ver el historial aquí.</p>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>

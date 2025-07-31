@@ -73,6 +73,7 @@
     
     <div class="nav-links">
         <a href="{% url 'añadir_objeto' %}">Añadir Objetos</a>
+        <a href="{% url 'historial_acciones' %}">Ver Historial</a>
     </div>
     
     <!-- Mostrar mensajes de éxito o error -->
@@ -111,6 +112,25 @@
         </div>
     {% else %}
         <p style="margin-top: 20px; color: #666;">No hay cajas creadas aún.</p>
+    {% endif %}
+    
+    <!-- Mostrar últimas acciones -->
+    {% if ultimas_acciones %}
+        <h2>Últimas Acciones</h2>
+        <div style="margin-top: 20px;">
+            {% for accion in ultimas_acciones %}
+                <div style="border: 1px solid #ddd; padding: 10px; margin: 10px 0; border-radius: 5px; background-color: #f8f9fa;">
+                    <strong>{{ accion.get_tipo_display }}</strong> - 
+                    <small style="color: #666;">{{ accion.fecha_hora|date:"d/m/Y H:i" }}</small><br>
+                    {% if accion.descripcion %}
+                        <span style="color: #555;">{{ accion.descripcion }}</span>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            <div style="text-align: center; margin-top: 15px;">
+                <a href="{% url 'historial_acciones' %}" style="color: #007bff; text-decoration: none;">Ver historial completo →</a>
+            </div>
+        </div>
     {% endif %}
 </body>
 </html>

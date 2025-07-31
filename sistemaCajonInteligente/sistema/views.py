@@ -1,6 +1,28 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .models import Cajon, Objeto
+from .models import Cajon, Objeto, Accion
+
+# Función auxiliar para registrar acciones
+def registrar_accion(tipo_accion, cajon=None, objeto=None, descripcion=""):
+    """
+    Registra una acción en el sistema
+    """
+    try:
+        accion = Accion(
+            tipo=tipo_accion,
+            cajon=cajon,
+            descripcion=descripcion
+        )
+        accion.save()
+        
+        # Si hay un objeto involucrado, lo agregamos a la relación ManyToMany
+        if objeto:
+            accion.objetosAfectados.add(objeto)
+            
+        return accion
+    except Exception as e:
+        print(f"Error al registrar acción: {str(e)}")
+        return None
 
 # Create your views here.
 
@@ -19,6 +41,13 @@ def crear_caja(request):
             # Guardar en la base de datos
             nuevo_cajon.save()
             
+            # Registrar la acción
+            registrar_accion(
+                tipo_accion='crear_cajon',
+                cajon=nuevo_cajon,
+                descripcion=f'Se creó la caja "{nombre}" con capacidad máxima de {capacidad_maxima} objetos'
+            )
+            
             # Mostrar mensaje de éxito
             messages.success(request, f'Caja "{nombre}" creada exitosamente!')
             
@@ -35,8 +64,12 @@ def crear_caja(request):
     # Si es GET o hubo error, mostrar el formulario
     # Obtener todas las cajas existentes para mostrarlas
     cajas = Cajon.objects.all()
+    # Obtener las últimas 5 acciones para mostrar en el dashboard
+    ultimas_acciones = Accion.objects.all().order_by('-fecha_hora')[:5]
+    
     context = {
-        'cajas': cajas
+        'cajas': cajas,
+        'ultimas_acciones': ultimas_acciones,
     }
     return render(request, 'InterfazCrearCajas.html', context)
 
@@ -74,6 +107,14 @@ def añadir_objeto(request):
             # Añadir el objeto a la caja
             caja.objetos.add(nuevo_objeto)
             caja.save()
+            
+            # Registrar la acción
+            registrar_accion(
+                tipo_accion='agregar_objeto',
+                cajon=caja,
+                objeto=nuevo_objeto,
+                descripcion=f'Se agregó el objeto "{nombre_objeto}" (tipo: {tipo_objeto}, tamaño: {tamanio_objeto}) a la caja "{caja.nombre}"'
+            )
 
             # Mostrar mensaje de éxito
             messages.success(request, f'Objeto "{nombre_objeto}" añadido a la caja "{caja.nombre}" exitosamente!')
@@ -114,3 +155,22 @@ def añadir_objeto(request):
         'tamanios_objeto': tamanios_objeto,
     }
     return render(request, 'InterfazAñadirObjetos.html', context)
+
+def historial_acciones(request):
+    """
+    Vista para mostrar el historial de todas las acciones realizadas en el sistema
+    """
+    # Obtener todas las acciones ordenadas por fecha (más recientes primero)
+    acciones = Accion.objects.all().order_by('-fecha_hora')
+    
+    # Paginación opcional (mostrar 20 acciones por página)
+    from django.core.paginator import Paginator
+    paginator = Paginator(acciones, 20)  # 20 acciones por página
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'acciones': page_obj,
+        'total_acciones': acciones.count(),
+    }
+    return render(request, 'historial_acciones.html', context)

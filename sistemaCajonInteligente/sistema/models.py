@@ -33,11 +33,23 @@ class Objeto(models.Model):
 
 class Accion(models.Model):
     tipo = [
-        ('agregar', 'Agregar'),
-        ('eliminar', 'Eliminar'),
-        ('modificar', 'Modificar'),
+        ('crear_cajon', 'Crear Cajón'),
+        ('agregar_objeto', 'Agregar Objeto'),
+        ('eliminar_objeto', 'Eliminar Objeto'),
+        ('modificar_cajon', 'Modificar Cajón'),
+        ('modificar_objeto', 'Modificar Objeto'),
     ]
 
-    cajon = models.ForeignKey(Cajon, on_delete=models.CASCADE, related_name='acciones')
+    cajon = models.ForeignKey(Cajon, on_delete=models.CASCADE, related_name='acciones', null=True, blank=True)
     objetosAfectados = models.ManyToManyField(Objeto, related_name='acciones', blank=True)
     tipo = models.CharField(max_length=50, choices=tipo)
+    descripcion = models.TextField(blank=True, null=True)  # Descripción detallada de la acción
+    fecha_hora = models.DateTimeField(auto_now_add=True)  # Timestamp automático
+    
+    class Meta:
+        ordering = ['-fecha_hora']  # Ordenar por fecha más reciente primero
+        verbose_name = 'Acción'
+        verbose_name_plural = 'Acciones'
+    
+    def __str__(self):
+        return f"{self.get_tipo_display()} - {self.fecha_hora.strftime('%d/%m/%Y %H:%M')}"
