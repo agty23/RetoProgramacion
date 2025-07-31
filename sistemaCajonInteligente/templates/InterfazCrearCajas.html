@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Crear Caja</title>
+</head>
+<body>
+<h1>Crear Caja</h1>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <label for="nombre">Nombre de la Caja:</label>
+    <input type="text" id="nombre" name="nombre" required>
+    <label for="capacidadMax">Capacidad Máxima:</label>
+    <input type="number" id="capacidadMax" name="capacidadMax" required>
+    <button type="submit">Crear</button>
+</form>
+</body>
+</html>

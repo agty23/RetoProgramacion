@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Agregar Objetos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-top: 20px;
+        }
+
+        form {
+            max-width: 500px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<h1>Añadir Objeto</h1>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <label for="nombre">Nombre del objeto:</label>
+    <input type="text" id="nombre" name="nombre" required>
+    <label for="tipoObjeto">Tipo del objeto:</label>
+    <input type="text" id="tipoObjeto" name="tipoObjeto" required>
+    <label for="caja">Caja:</label>
+    <select id="caja" name="caja">
+        {% for caja in cajas %}
+        <option value="{{ caja.id }}">{{ caja.nombre }}</option>
+        {% endfor %}
+    </select>
+    <label for="foto">Foto del objeto:</label>
+    <input type="file" id="foto" name="foto" accept="image/*">
+    <button type="submit">Agregar</button>
+</form>
+</body>
+</html>

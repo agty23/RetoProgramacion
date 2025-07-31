@@ -1,10 +1,12 @@
 from django.db import models
 
+
 # Create your models here.
 class Cajon(models.Model):
     nombre = models.CharField(max_length=100)
     capacidadMaxima = models.IntegerField()
     objetos = models.ManyToManyField('Objeto', related_name='cajones')
+
 
 class Objeto(models.Model):
     tipo = [
@@ -26,6 +28,8 @@ class Objeto(models.Model):
     nombre = models.CharField(max_length=100)
     tipo = models.CharField(max_length=50, choices=tipo)
     tamanio = models.CharField(max_length=50, choices=tamanio)
+    imagen = models.ImageField(upload_to='objetos/', null=True, blank=True)
+
 
 class Accion(models.Model):
     tipo = [
@@ -37,5 +41,3 @@ class Accion(models.Model):
     cajon = models.ForeignKey(Cajon, on_delete=models.CASCADE, related_name='acciones')
     objetosAfectados = models.ManyToManyField(Objeto, related_name='acciones', blank=True)
     tipo = models.CharField(max_length=50, choices=tipo)
-
-    
