@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle de Caja - {{ caja.nombre }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-top: 20px;
+        }
+
+        .nav-links {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .nav-links a {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 0 10px;
+        }
+        
+        .nav-links a:hover {
+            background-color: #218838;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+
+        .caja-info {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #1976d2;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .ordenamiento {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .ordenamiento h3 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .orden-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .orden-btn {
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 4px;
+            border: 2px solid #007bff;
+            color: #007bff;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .orden-btn:hover {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .orden-btn.active {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .sugerencias {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .sugerencias h3 {
+            margin-top: 0;
+            color: #856404;
+        }
+
+        .sugerencia-item {
+            background: #fff;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #ffc107;
+        }
+
+        .objetos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .objeto-card {
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #007bff;
+        }
+
+        .objeto-card.duplicado {
+            border-left-color: #ffc107;
+            background-color: #fffbf0;
+        }
+
+        .objeto-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .objeto-nombre {
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #333;
+        }
+
+        .objeto-badge {
+            background-color: #6c757d;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+        }
+
+        .objeto-badge.duplicado {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .objeto-detalles {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .objeto-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-eliminar {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-eliminar:hover {
+            background-color: #c82333;
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-eliminar-duplicados {
+            background-color: #dc3545;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        .btn-eliminar-duplicados:hover {
+            background-color: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .no-objetos {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 40px;
+            background: #fff;
+            border-radius: 8px;
+        }
+
+        .progress-bar {
+            background-color: #e0e0e0;
+            height: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: #4caf50;
+            transition: width 0.3s;
+        }
+
+        .progress-fill.warning {
+            background-color: #ff9800;
+        }
+
+        .progress-fill.danger {
+            background-color: #f44336;
+        }
+    </style>
+</head>
+<body>
+    <h1>{{ caja.nombre }}</h1>
+    
+    <div class="nav-links">
+        <a href="{% url 'crear_caja' %}">Crear Cajas</a>
+        <a href="{% url 'añadir_objeto' %}">Añadir Objetos</a>
+        <a href="{% url 'historial_acciones' %}">Ver Historial</a>
+    </div>
+
+    <div class="container">
+        <!-- Información de la caja -->
+        <div class="caja-info">
+            <h2>Información de la Caja</h2>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-number">{{ total_objetos }}</div>
+                    <div class="stat-label">Objetos</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">{{ caja.capacidadMaxima }}</div>
+                    <div class="stat-label">Capacidad</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">{{ porcentaje_ocupacion }}%</div>
+                    <div class="stat-label">Ocupación</div>
+                </div>
+                {% if sugerencias %}
+                <div class="stat-item">
+                    <div class="stat-number" style="color: #dc3545;">{{ sugerencias|length }}</div>
+                    <div class="stat-label">Tipos Duplicados</div>
+                </div>
+                {% endif %}
+            </div>
+            
+        </div>
+
+        <!-- Sugerencias para duplicados -->
+        {% if sugerencias %}
+            <div class="sugerencias">
+                <h3>⚠️ Sugerencias de Organización</h3>
+                <p>Hemos detectado objetos que están duplicados (mismo nombre, tipo y tamaño). Considera eliminar los duplicados:</p>
+                {% for sugerencia in sugerencias %}
+                    <div class="sugerencia-item">
+                        <strong>{{ sugerencia.nombre }}</strong> 
+                        <span style="color: #666;">({{ sugerencia.tipo }}, {{ sugerencia.tamanio }})</span> - 
+                        <span style="color: #d63384;">{{ sugerencia.cantidad }} objetos idénticos encontrados</span>
+                        <br>
+                        <small style="color: #666;">
+                            Estos objetos tienen exactamente el mismo nombre, tipo y tamaño. Se recomienda conservar solo uno.
+                        </small>
+                    </div>
+                {% endfor %}
+                
+                <!-- Botón para eliminar todos los duplicados -->
+                <div style="margin-top: 20px; text-align: center;">
+                    <form method="post" action="{% url 'eliminar_duplicados' caja.id %}" style="display: inline;" 
+                          onsubmit="return confirm('¿Estás seguro de que quieres eliminar todos los objetos duplicados? Se conservará solo una copia de cada objeto único.')">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-eliminar-duplicados">
+                            🧹 Eliminar Todos los Duplicados
+                        </button>
+                    </form>
+                    <br>
+                    <small style="color: #666; margin-top: 10px; display: block;">
+                        Esta acción eliminará automáticamente los objetos duplicados, conservando solo una copia de cada uno.
+                    </small>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Opciones de ordenamiento -->
+        <div class="ordenamiento">
+            <h3>🔄 Ordenar Objetos</h3>
+            <div class="orden-buttons">
+                <a href="?orden=nombre" class="orden-btn {% if orden_actual == 'nombre' %}active{% endif %}">
+                    Por Nombre
+                </a>
+                <a href="?orden=tipo" class="orden-btn {% if orden_actual == 'tipo' %}active{% endif %}">
+                    Por Tipo
+                </a>
+                <a href="?orden=tamanio" class="orden-btn {% if orden_actual == 'tamanio' %}active{% endif %}">
+                    Por Tamaño
+                </a>
+            </div>
+        </div>
+
+        <!-- Lista de objetos -->
+        {% if objetos %}
+            <div class="objetos-grid">
+                {% for objeto in objetos %}
+                    <div class="objeto-card {% if objeto in duplicados %}duplicado{% endif %}">
+                        <div class="objeto-header">
+                            <span class="objeto-nombre">{{ objeto.nombre }}</span>
+                            {% if objeto in duplicados %}
+                                <span class="objeto-badge duplicado">Posible Duplicado</span>
+                            {% endif %}
+                        </div>
+                        <div class="objeto-detalles">
+                            <strong>Tipo:</strong> {{ objeto.get_tipo_display }}<br>
+                            <strong>Tamaño:</strong> {{ objeto.get_tamanio_display }}
+                            {% if objeto in duplicados %}
+                                <br><small style="color: #d63384; font-weight: bold;">⚠️ Objeto duplicado detectado</small>
+                            {% endif %}
+                        </div>
+                        <div class="objeto-actions">
+                            <form method="post" action="{% url 'eliminar_objeto' objeto.id %}" style="display: inline;" 
+                                  onsubmit="return confirm('¿Estás seguro de que quieres eliminar este objeto?')">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-eliminar">🗑️ Eliminar</button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-objetos">
+                <p>Esta caja está vacía.</p>
+                <p><a href="{% url 'añadir_objeto' %}" style="color: #007bff;">¡Añade algunos objetos!</a></p>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>

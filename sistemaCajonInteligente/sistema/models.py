@@ -38,6 +38,8 @@ class Accion(models.Model):
         ('eliminar_objeto', 'Eliminar Objeto'),
         ('modificar_cajon', 'Modificar Cajón'),
         ('modificar_objeto', 'Modificar Objeto'),
+        ('visualizar_caja', 'Visualizar Caja'),
+        ('organizar_caja', 'Organizar Caja'),
     ]
 
     cajon = models.ForeignKey(Cajon, on_delete=models.CASCADE, related_name='acciones', null=True, blank=True)
