@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import Cajon, Objeto
 
+
 # Create your views here.
 
 def crear_caja(request):
@@ -9,7 +10,7 @@ def crear_caja(request):
         # Obtener los datos del formulario
         nombre = request.POST.get('nombre')
         capacidad_maxima = request.POST.get('capacidadMax')
-        
+
         try:
             # Crear una nueva instancia de Cajon
             nuevo_cajon = Cajon(
@@ -18,20 +19,20 @@ def crear_caja(request):
             )
             # Guardar en la base de datos
             nuevo_cajon.save()
-            
+
             # Mostrar mensaje de éxito
             messages.success(request, f'Caja "{nombre}" creada exitosamente!')
-            
+
             # Redireccionar para evitar reenvío del formulario
             return redirect('crear_caja')
-            
+
         except ValueError:
             # Error si la capacidad no es un número válido
             messages.error(request, 'La capacidad máxima debe ser un número válido.')
         except Exception as e:
             # Error general
             messages.error(request, f'Error al crear la caja: {str(e)}')
-    
+
     # Si es GET o hubo error, mostrar el formulario
     # Obtener todas las cajas existentes para mostrarlas
     cajas = Cajon.objects.all()
@@ -40,6 +41,7 @@ def crear_caja(request):
     }
     return render(request, 'InterfazCrearCajas.html', context)
 
+
 def añadir_objeto(request):
     if request.method == 'POST':
         # Obtener los datos del formulario
@@ -47,30 +49,32 @@ def añadir_objeto(request):
         tipo_objeto = request.POST.get('tipoObjeto')
         tamanio_objeto = request.POST.get('tamanio', 'mediano')  # Valor por defecto
         caja_id = request.POST.get('caja')
+        foto = request.FILES.get('foto')
 
         try:
             # Validar que todos los campos requeridos estén presentes
             if not nombre_objeto or not tipo_objeto or not caja_id:
                 messages.error(request, 'Por favor, completa todos los campos requeridos.')
                 raise ValueError('Campos incompletos')
-            
+
             # Obtener la caja seleccionada
             caja = Cajon.objects.get(id=caja_id)
-            
+
             # Validar el tipo de objeto (debe estar en las opciones válidas)
             tipos_validos = ['ropa', 'peleria', 'cables', 'herramientas', 'juguetes', 'papeleria', 'electronica']
             if tipo_objeto.lower() not in tipos_validos:
                 # Si el tipo no está en la lista, usamos 'papeleria' como valor por defecto
                 tipo_objeto = 'papeleria'
-            
+
             # Crear el nuevo objeto
             nuevo_objeto = Objeto(
                 nombre=nombre_objeto,
                 tipo=tipo_objeto.lower(),
-                tamanio=tamanio_objeto
+                tamanio=tamanio_objeto,
+                imagen=foto
             )
             nuevo_objeto.save()
-            
+
             # Añadir el objeto a la caja
             caja.objetos.add(nuevo_objeto)
             caja.save()
@@ -89,7 +93,7 @@ def añadir_objeto(request):
     # Si es GET o hubo error, mostrar el formulario
     cajas = Cajon.objects.all()
     objetos = Objeto.objects.all()
-    
+
     # Obtener las opciones de tipo y tamaño para el template
     tipos_objeto = [
         ('ropa', 'Ropa'),
@@ -100,13 +104,13 @@ def añadir_objeto(request):
         ('papeleria', 'Papelería'),
         ('electronica', 'Electrónica'),
     ]
-    
+
     tamanios_objeto = [
         ('pequeno', 'Pequeño'),
         ('mediano', 'Mediano'),
         ('grande', 'Grande'),
     ]
-    
+
     context = {
         'cajas': cajas,
         'objetos': objetos,
